@@ -1,1 +1,0 @@
-cmd_/home/swang/WSZgithub/Zmodules/x86_64/node_0/hello1.ko := ld -r -m elf_x86_64 -T /usr/src/linux-headers-3.2.0-33-generic/scripts/module-common.lds --build-id  -o /home/swang/WSZgithub/Zmodules/x86_64/node_0/hello1.ko /home/swang/WSZgithub/Zmodules/x86_64/node_0/hello1.o /home/swang/WSZgithub/Zmodules/x86_64/node_0/hello1.mod.o
