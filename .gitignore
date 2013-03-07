@@ -19,3 +19,10 @@
 
 # Temps
 *~
+
+# UNKNOWN FILES
+/.tmp_versions
+*.cmd
+*.order
+*.mod.c
+*.symvers
