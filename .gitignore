@@ -26,3 +26,6 @@
 *.order
 *.mod.c
 *.symvers
+
+#compiled files
+hello
