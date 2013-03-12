@@ -3,16 +3,18 @@
  */
  
 #include <linux/module.h>
-#include <linux/kernel.h>
+#include <linux/init.h>
 
-static __init init_module(void)
+static hello_init(void)
 {
-  printk(KERN_INFO "Hello kernel 1.\n");
+  printk(KERN_ALERT "Hello kernel 1.\n");
   return 0;
 }
 
-static void __exit cleanup_module(void)
+static void hello_exit(void)
 {
-  printk(KERN_INFO "Goodbye kernel 1.\n");
+  printk(KERN_ALERT "Goodbye kernel 1.\n");
 }
 
+module_init(hello_init);
+module_exit(hello_exit);
