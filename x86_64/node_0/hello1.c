@@ -5,7 +5,7 @@
 #include <linux/module.h>
 #include <linux/init.h>
 
-static hello_init(void)
+static int hello_init(void)
 {
   printk(KERN_ALERT "Hello kernel 1.\n");
   return 0;

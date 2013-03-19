@@ -21,7 +21,7 @@
 *~
 
 # UNKNOWN FILES
-/.tmp_versions
+.tmp_versions/
 *.cmd
 *.order
 *.mod.c
