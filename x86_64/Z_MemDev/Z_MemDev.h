@@ -18,24 +18,32 @@
 
 #define Z_MEMDEV_MAJOR 0
 #define Z_MEMDEV_MINOR 0
-#define Z_MEMDEV_SINGLE_NUM 4
+#define Z_MEMDEV_NUM 4
 
-typedef struct data_list {
-	void **data_unit;
-	struct data_list *next;
-}data_list;
+#ifndef MEMDEV_LIST_SIZE
+#define MEMDEV_LIST_SIZE 4000
+#endif
+
+#ifndef MEMDEV_LIST_LENGTH
+#define MEMDEV_LIST_LENGTH 1000
+#endif
+typedef struct Z_MemDev_list {
+	void **data;
+	struct Z_MemDev_list *next;
+}Z_MemDev_list;
 
 typedef struct Z_MemDev_dev {
-	struct data_list *data;  
-	int list_length;              /* the current quantum size */
-	int unit_size;                 /* the current array size */
-	unsigned long size;       
+	struct Z_MemDev_list *list;  
+	int size;                   /* the current quantum size */
+	int length;                 /* the current array size */
+	unsigned long total_size;       
 	//unsigned int access_key;  
 	//struct semaphore sem;     
-	struct cdev cdev;	        /* Char device structure		*/
+	struct cdev cdev;	          /* Char device structure		*/
 }Z_MemDev_dev;
 
-
+extern int MemDev_list_size;
+extern int MemDev_list_length;
 
 
 
