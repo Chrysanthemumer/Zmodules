@@ -12,33 +12,37 @@
  * comes from 'Sizhou Wang, Ilinois Institute of Technology'.
  * No warrenty is attached.
  */
- 
-static int Z_MemDev_open(struct inode *inode, struct file *filp)
+
+#include <linux/fs.h>
+
+#include "Z_MemDev.h"
+
+int Z_MemDev_open(struct inode *inode, struct file *filp)
 {
-  printk(KERN_INFO "Z_MemDev:  open() - Start -\n");
-  printk(KERN_INFO "Z_MemDev:  open()  - End -\n");
+  printk(KERN_INFO "Z_MemDev: fops.open() - Start -\n");
+  printk(KERN_INFO "Z_MemDev: fops.open()  - End -\n");
   return 0;
 }
 
-static int Z_MemDev_close(struct inode *inode, struct file *filp)
+int Z_MemDev_release(struct inode *inode, struct file *filp)
 {
-  printk(KERN_INFO "Z_MemDev: release() - Start -\n");
-  printk(KERN_INFO "Z_MemDev: release()  - End -\n");
+  printk(KERN_INFO "Z_MemDev: fops.release() - Start -\n");
+  printk(KERN_INFO "Z_MemDev: fops.release()  - End -\n");
   return 0;
 }
 
-static ssize_t Z_MemDev_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
+ssize_t Z_MemDev_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
-  printk(KERN_INFO "Z_MemDev:  read() - Start -\n");
-  printk(KERN_INFO "Z_MemDev:  read()  - End -\n");
+  printk(KERN_INFO "Z_MemDev: fops.read() - Start -\n");
+  printk(KERN_INFO "Z_MemDev: fops.read()  - End -\n");
   return 0;
 }
 
-static ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)
+ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)
 {
-  printk(KERN_INFO "Z_MemDev: write() - Start -\n");
-  printk(KERN_INFO "Z_MemDev: write()  - End -\n");
-  return len;
+  printk(KERN_INFO "Z_MemDev: fops.write() - Start -\n");
+  printk(KERN_INFO "Z_MemDev: fops.write()  - End -\n");
+  return count;
 }
  
  

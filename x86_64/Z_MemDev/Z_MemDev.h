@@ -13,6 +13,8 @@
  * No warrenty is attached.
  */
  
+ #include <linux/cdev.h>
+ 
 #ifndef _Z_MEMDEV_H_
 #define _Z_MEMDEV_H_
 
@@ -27,11 +29,17 @@
 #ifndef MEMDEV_LIST_LENGTH
 #define MEMDEV_LIST_LENGTH 1000
 #endif
+
+#ifndef Z_MEMDEV_LIST
+#define Z_MEMDEV_LIST
 typedef struct Z_MemDev_list {
 	void **data;
 	struct Z_MemDev_list *next;
 }Z_MemDev_list;
+#endif
 
+#ifndef Z_MEMDEV_DEV
+#define Z_MEMDEV_DEV
 typedef struct Z_MemDev_dev {
 	struct Z_MemDev_list *list;  
 	int size;                   /* the current quantum size */
@@ -39,14 +47,15 @@ typedef struct Z_MemDev_dev {
 	unsigned long total_size;       
 	//unsigned int access_key;  
 	//struct semaphore sem;     
-	struct cdev cdev;	          /* Char device structure		*/
+	struct cdev st_cdev;	          /* Char device structure		*/
 }Z_MemDev_dev;
+#endif
 
 extern int MemDev_list_size;
 extern int MemDev_list_length;
 
 int Z_MemDev_open(struct inode *inode, struct file *filp);
-int Z_MemDev_close(struct inode *inode, struct file *filp);
+int Z_MemDev_release(struct inode *inode, struct file *filp);
 ssize_t Z_MemDev_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos);
 ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos);
 

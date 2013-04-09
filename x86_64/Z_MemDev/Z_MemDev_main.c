@@ -42,11 +42,11 @@ MODULE_LICENSE("Dual BSD/GPL");
 
 struct file_operations MemDev_fops = {
   .owner   = THIS_MODULE,
-  //.llseek  = ;
-  //.read    = ;
-  //.write   = ;
-  //.open    = ;
-  //.release = ;
+  //.llseek  = ,
+  .read    = Z_MemDev_read,
+  .write   = Z_MemDev_write,
+  .open    = Z_MemDev_open,
+  .release = Z_MemDev_release,
 };
 /*****************************************************************************/
 /*   Function: Z_MemDev_trim                                                 */
@@ -92,16 +92,21 @@ static void __exit Z_MemDev_cleanup_module(void)
 {
   int i;
   int devno = MKDEV(MemDev_major, MemDev_minor);
+  
+  printk(KERN_INFO "Z_MemDev: Cleanup() - Start -\n");
+  
   /* 1. Release the Each Device Structure Memory */
   if(MemDev_devices){
     for(i = 0; i < MemDev_num; i++){
       Z_MemDev_trim(MemDev_devices + i);
-      cdev_del(&MemDev_devices[i].cdev);
+      cdev_del(&MemDev_devices[i].st_cdev);
     }
     kfree(MemDev_devices);
   }
   /* 2. Unregister Devices */
 	unregister_chrdev_region(devno, MemDev_num);
+	
+	printk(KERN_INFO "Z_MemDev: Cleanup()  - End -\n");
 }
 
 /*****************************************************************************/
@@ -115,9 +120,10 @@ static void __init Z_MemDev_setup_cdev(struct Z_MemDev_dev *dev, int index)
 {
   int err;
   int devno = MKDEV(MemDev_major, MemDev_minor + index);
-  cdev_init(&dev->cdev, &MemDev_fops);
-  dev->cdev.owner = THIS_MODULE;
-  err = cdev_add(&dev->cdev, devno, 1);
+  printk(KERN_INFO "Z_MemDev: setup() - Running -\n");
+  cdev_init(&dev->st_cdev, &MemDev_fops);
+  dev->st_cdev.owner = THIS_MODULE;
+  err = cdev_add(&dev->st_cdev, devno, 1);
   if(err < 0){
     printk(KERN_NOTICE "Z_MemDev: Error %d adding device [%d]\n", err, devno);
   }
@@ -134,6 +140,8 @@ static int __init Z_MemDev_init_module(void)
   int err, i;
   dev_t dev = 0;
   
+  printk(KERN_INFO "Z_MemDev: init() - Start -\n");
+  
   /* 1. Register Devices */
   err = alloc_chrdev_region(&dev, 0, MemDev_num, "Z_MemDev");
   MemDev_major = MAJOR(dev);
@@ -146,7 +154,7 @@ static int __init Z_MemDev_init_module(void)
   if(MemDev_devices == NULL){
     printk(KERN_WARNING "Z_MemDev: Cannot kmalloc during init_module\n");
     err = -ENOMEM;
-    Z_MemDev_cleanup_module();
+    //Z_MemDev_cleanup_module();
     return err;  
   }
   memset(MemDev_devices, 0, MemDev_num * sizeof(struct Z_MemDev_dev));
@@ -160,7 +168,8 @@ static int __init Z_MemDev_init_module(void)
     Z_MemDev_setup_cdev(&MemDev_devices[i], i);
     
   }
-  printk(KERN_WARNING "Z_MemDev: @@@@@@@@@@@@@@@@@@@\n");
+  
+  printk(KERN_INFO "Z_MemDev: init()  - End -\n");
   return 0; 
 }
 
