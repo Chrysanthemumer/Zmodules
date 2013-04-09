@@ -88,7 +88,7 @@ int Z_MemDev_trim(struct Z_MemDev_dev *dev)
 /*             initialization failure.                                       */
 /*     return: void                                                          */
 /*****************************************************************************/
-static void Z_MemDev_cleanup_module(void)
+static void __exit Z_MemDev_cleanup_module(void)
 {
   int i;
   int devno = MKDEV(MemDev_major, MemDev_minor);
@@ -154,7 +154,8 @@ static int __init Z_MemDev_init_module(void)
   for(i = 0; i < MemDev_num; i++){
     MemDev_devices[i].length = MemDev_list_length;
     MemDev_devices[i].size   = MemDev_list_size;
-    
+    MemDev_devices[i].list   = NULL;
+    MemDev_devices[i].total_size   = 0;
     //Mutex here
     Z_MemDev_setup_cdev(&MemDev_devices[i], i);
     
