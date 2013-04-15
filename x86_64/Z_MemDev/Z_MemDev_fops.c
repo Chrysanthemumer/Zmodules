@@ -16,9 +16,21 @@
 #include <linux/fs.h>
 #include <linux/kernel.h>
 #include <linux/fcntl.h>
+#include <linux/string.h>
+#include <linux/slab.h>
+#include <linux/uaccess.h>
 
 #include "Z_MemDev.h"
 
+/*****************************************************************************/
+/*   Function: Z_MemDev_open                                                 */
+/*Description: 'file_operations' open function for MemDev. It helps find     */
+/*             Z_MemDev_dev structure every time the device is being opend   */
+/*             for file operation.                                           */
+/*     return: int                                                           */
+/*              0 - success                                                  */
+/*             other - errno.h                                               */
+/*****************************************************************************/
 int Z_MemDev_open(struct inode *inode, struct file *filp)
 {
   struct Z_MemDev_dev *dev;
@@ -37,7 +49,12 @@ int Z_MemDev_open(struct inode *inode, struct file *filp)
   printk(KERN_INFO "Z_MemDev: fops.open()  - End -\n");
   return 0;
 }
-
+/*****************************************************************************/
+/*   Function: Z_MemDev_release                                              */
+/*Description: 'file_operations' release function for MemDev.                */
+/*     return: int                                                           */
+/*              0 - success                                                  */
+/*****************************************************************************/
 int Z_MemDev_release(struct inode *inode, struct file *filp)
 {
   printk(KERN_INFO "Z_MemDev: fops.release() - Start -\n");
@@ -45,11 +62,77 @@ int Z_MemDev_release(struct inode *inode, struct file *filp)
   return 0;
 }
 
+/*****************************************************************************/
+/*   Function: Z_MemDev_follow                                               */
+/*Description: Helps 'read' and 'write' locate the element in the link-list. */
+/*     return: struct Z_MemDev_list *                                        */
+/*             The element pointer is being returned.                        */
+/*****************************************************************************/
+struct Z_MemDev_list *Z_MemDev_followlist(struct Z_MemDev_dev *dev, int n)
+{
+  struct Z_MemDev_list *list = dev->list;
+  /* 1. Check and Allocate the first element */
+  if(!list) {
+    dev->list = kmalloc(sizeof(struct Z_MemDev_list), GFP_KERNEL);
+    list = dev->list;
+    memset(list, 0, sizeof(struct Z_MemDev_list));
+  }
+  /* 2. follow the list to the n-th element */
+  while(n--) {
+    if(!list->next) {
+      list->next = kmalloc(sizeof(struct Z_MemDev_list), GFP_KERNEL);
+      memset(list, 0, sizeof(struct Z_MemDev_list));
+    }
+    list = list->next;
+    continue;
+  }
+  
+  return list;
+}
+
+
 ssize_t Z_MemDev_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
+  struct Z_MemDev_dev *dev = filp->private_data;
+  struct Z_MemDev_list *element = NULL;
+  int elementsize = dev->size * dev->length;
+  int quotient, remainder;
+  int sub_quotient, sub_remainder;
+  
   printk(KERN_INFO "Z_MemDev: fops.read() - Start -\n");
+  /* 1. f_pos reaches the end of MemDev */
+  if(*f_pos >= dev->total_size) {
+    printk(KERN_INFO "Z_MemDev: read(): EOF reached, none read.\n");
+    return 0;
+  }
+  /* 2. Update count value according to f_pos and total size */
+  if(*f_pos + count > dev->total_size) {
+    count = dev->total_size - *f_pos;
+  }
+  /* 3. Calculate and get the list element */
+  quotient  = (long)*f_pos / elementsize;
+  remainder = (long)*f_pos % elementsize;
+  sub_quotient  = remainder / dev->size;
+  sub_remainder = remainder / dev->size;
+  element = Z_MemDev_followlist(dev, quotient);
+  if(!element || !element->data || !element->data[sub_remainder]) {
+    printk(KERN_NOTICE "Z_MemDev: Error in read():followlist()\n");
+    return 0;
+  }
+  /* 4. Read MAXIMUM one array member size of data; */
+  /*    Update count the second time.               */
+  if(count > dev->size){
+    count = dev->size - sub_remainder;
+  }
+  if(copy_to_user(buf, element->data[sub_quotient]+sub_remainder, count)) {
+    printk(KERN_NOTICE "Z_MemDev: Error in read():copy_to_user()\n");
+    return -EFAULT;
+  }
+  *f_pos += count;
+  printk(KERN_INFO "Z_MemDev: fops.read() data copied [%d]\n", (unsigned int)count);
+  
   printk(KERN_INFO "Z_MemDev: fops.read()  - End -\n");
-  return 0;
+  return count;
 }
 
 ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)

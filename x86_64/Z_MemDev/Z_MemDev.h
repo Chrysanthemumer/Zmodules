@@ -42,8 +42,8 @@ typedef struct Z_MemDev_list {
 #define Z_MEMDEV_DEV
 typedef struct Z_MemDev_dev {
 	struct Z_MemDev_list *list;  
-	int size;                   /* the current quantum size */
-	int length;                 /* the current array size */
+	int size;                   /* the current 2-dim array member size (2nd tier)*/
+	int length;                 /* the current 2-dim array size (1st tier)*/
 	unsigned long total_size;       
 	//unsigned int access_key;  
 	//struct semaphore sem;     
