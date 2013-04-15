@@ -53,13 +53,14 @@ typedef struct Z_MemDev_dev {
 
 extern int MemDev_list_size;
 extern int MemDev_list_length;
-
+// File Operations
 int Z_MemDev_open(struct inode *inode, struct file *filp);
 int Z_MemDev_release(struct inode *inode, struct file *filp);
 ssize_t Z_MemDev_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos);
 ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos);
 
-
+//Helpers
+int Z_MemDev_trim(struct Z_MemDev_dev *dev);
 
 
 

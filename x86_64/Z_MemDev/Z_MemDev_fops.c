@@ -14,12 +14,26 @@
  */
 
 #include <linux/fs.h>
+#include <linux/kernel.h>
+#include <linux/fcntl.h>
 
 #include "Z_MemDev.h"
 
 int Z_MemDev_open(struct inode *inode, struct file *filp)
 {
+  struct Z_MemDev_dev *dev;
+  int err;
+  
   printk(KERN_INFO "Z_MemDev: fops.open() - Start -\n");
+    
+  dev = container_of(inode->i_cdev, struct Z_MemDev_dev, st_cdev);
+  filp->private_data = dev;
+  
+  if((filp->f_flags & O_ACCMODE) == O_WRONLY) {
+    err = Z_MemDev_trim(dev);
+    if(err != 0) printk(KERN_NOTICE "Z_MemDev: Error getting ready for WRITE_ONLY\n");
+  }    
+  
   printk(KERN_INFO "Z_MemDev: fops.open()  - End -\n");
   return 0;
 }
