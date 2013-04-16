@@ -90,7 +90,12 @@ struct Z_MemDev_list *Z_MemDev_followlist(struct Z_MemDev_dev *dev, int n)
   return list;
 }
 
-
+/*****************************************************************************/
+/*   Function: Z_MemDev_read                                                 */
+/*Description: Copy less than one MemDev_list.data[] member at f_pos to user */
+/*             space.                                                        */
+/*     return: size_t being copied.                                          */
+/*****************************************************************************/
 ssize_t Z_MemDev_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
   struct Z_MemDev_dev *dev = filp->private_data;
@@ -121,7 +126,7 @@ ssize_t Z_MemDev_read(struct file *filp, char __user *buf, size_t count, loff_t 
   }
   /* 4. Read MAXIMUM one array member size of data; */
   /*    Update count the second time.               */
-  if(count > dev->size){
+  if(count > dev->size - sub_remainder){
     count = dev->size - sub_remainder;
   }
   if(copy_to_user(buf, element->data[sub_quotient]+sub_remainder, count)) {
@@ -129,15 +134,64 @@ ssize_t Z_MemDev_read(struct file *filp, char __user *buf, size_t count, loff_t 
     return -EFAULT;
   }
   *f_pos += count;
-  printk(KERN_INFO "Z_MemDev: fops.read() data copied [%d]\n", (unsigned int)count);
+  printk(KERN_INFO "Z_MemDev: fops.read() copied [%d]\n", (unsigned int)count);
   
   printk(KERN_INFO "Z_MemDev: fops.read()  - End -\n");
   return count;
 }
 
+/*****************************************************************************/
+/*   Function: Z_MemDev_write                                                */
+/*Description: Copy less than one MemDev_list.data[] member at f_pos from    */
+/*             user space.                                                   */
+/*     return: size_t being copied.                                          */
+/*****************************************************************************/
 ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)
 {
+  struct Z_MemDev_dev *dev = filp->private_data;
+  struct Z_MemDev_list *element = NULL;
+  int elementsize = dev->size * dev->length;
+  int quotient, remainder;
+  int sub_quotient, sub_remainder;
+
   printk(KERN_INFO "Z_MemDev: fops.write() - Start -\n");
+  /* 1. Calculate and get the list element */
+  quotient  = (long)*f_pos / elementsize;
+  remainder = (long)*f_pos % elementsize;
+  sub_quotient  = remainder / dev->size;
+  sub_remainder = remainder / dev->size;
+  element = Z_MemDev_followlist(dev, quotient);
+  if(!element) {
+    printk(KERN_NOTICE "Z_MemDev: Error in write():followlist()\n");
+    return 0;
+  }
+  /* 2. Initialize memory if not initiailzed yet */
+  if(!element->data) {
+    element->data = kmalloc(dev->length * sizeof(char *), GFP_KERNEL);
+    if(!element->data) {
+      printk(KERN_NOTICE "Z_MemDev: Error in write():fail to allocate list element memory\n");
+      return 0;
+    }
+    memset(element->data, 0, dev->length * sizeof(char *));
+  }
+  if(!element->data[sub_quotient]) {
+    element->data[sub_quotient] = kmalloc(dev->size, GFP_KERNEL);
+    if(!element->data[sub_quotient]) {
+      printk(KERN_NOTICE "Z_MemDev: Error in write():fail to allocate element member memory\n");
+      return 0;
+    }
+  }
+  /* 3. Copy up-to the end of this memory from user */
+  if(count > dev->size - sub_remainder){
+    count = dev->size - sub_remainder;
+  }
+  if(copy_from_user(element->data[sub_quotient]+sub_remainder, buf, count)) {
+    printk(KERN_NOTICE "Z_MemDev: Error in read():copy_to_user()\n");
+    return -EFAULT;
+  }
+  *f_pos += count;
+  printk(KERN_INFO "Z_MemDev: fops.write() copied [%d]\n", (unsigned int)count);
+  
   printk(KERN_INFO "Z_MemDev: fops.write()  - End -\n");
   return count;
 }
