@@ -106,7 +106,7 @@ ssize_t Z_MemDev_read(struct file *filp, char __user *buf, size_t count, loff_t 
   
   printk(KERN_INFO "Z_MemDev: fops.read() - Start -\n");
   /* 1. f_pos reaches the end of MemDev */
-  if(*f_pos >= dev->total_size) {
+  if((int)*f_pos >= dev->total_size) {
     printk(KERN_INFO "Z_MemDev: read(): f_ops=[%d]\n", (int)*f_pos);
     printk(KERN_INFO "Z_MemDev: read(): EOF reached, none read.\n");
     return 0;
