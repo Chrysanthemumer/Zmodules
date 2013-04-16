@@ -194,6 +194,11 @@ ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, 
   }
   *f_pos += count;
   printk(KERN_INFO "Z_MemDev: fops.write() copied [%d]\n", (unsigned int)count);
+  /* 4. Update total_size */
+  if(dev->total_size < *f_pos) {
+    dev->total_size = *f_pos;
+  }
+  
   
   printk(KERN_INFO "Z_MemDev: fops.write()  - End -\n");
   return count;
