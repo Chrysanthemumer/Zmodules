@@ -1,7 +1,7 @@
 /*
  * Z_MemDev_fops.c -- File Operations for MemDev.
  *
- * version 0.1
+ * version 1.0
  * 
  * Copyright (C) 2013 Sizhou Wang
  * Copyright (C) 2010 IIT
@@ -210,4 +210,5 @@ ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, 
  * Version History:
  *
  * 0.1: initialization version.
+ * 1.0: file_operations version.
  */

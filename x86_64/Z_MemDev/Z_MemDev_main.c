@@ -2,7 +2,7 @@
  * Z_MemDev.c -- Memory Devices develpment module
                         with least functions
  *
- * version 0.1
+ * version 1.0
  * 
  * Copyright (C) 2013 Sizhou Wang
  * Copyright (C) 2010 IIT
@@ -181,4 +181,5 @@ module_exit(Z_MemDev_cleanup_module);
  * Version History:
  *
  * 0.1: initialization version.
+ * 1.0: file_operations version.
  */

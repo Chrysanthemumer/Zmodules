@@ -1,7 +1,7 @@
 /*
  * Z_MemDev.h -- header for Memory Devices development modules
  *
- * version 0.1
+ * version 1.0
  * 
  * Copyright (C) 2013 Sizhou Wang
  * Copyright (C) 2010 IIT
@@ -75,6 +75,7 @@ int Z_MemDev_trim(struct Z_MemDev_dev *dev);
  * Version History:
  *
  * 0.1: initialization version.
+ * 1.0: file_operations version.
  */
  
  #endif
