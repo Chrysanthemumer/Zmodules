@@ -107,6 +107,7 @@ ssize_t Z_MemDev_read(struct file *filp, char __user *buf, size_t count, loff_t 
   printk(KERN_INFO "Z_MemDev: fops.read() - Start -\n");
   /* 1. f_pos reaches the end of MemDev */
   if(*f_pos >= dev->total_size) {
+    printk(KERN_INFO "Z_MemDev: read(): f_ops=[%d]\n", (int)*f_pos);
     printk(KERN_INFO "Z_MemDev: read(): EOF reached, none read.\n");
     return 0;
   }
@@ -155,6 +156,7 @@ ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, 
   int sub_quotient, sub_remainder;
 
   printk(KERN_INFO "Z_MemDev: fops.write() - Start -\n");
+  printk(KERN_INFO "Z_MemDev: write(): f_ops=[%d]\n", (int)*f_pos);
   /* 1. Calculate and get the list element */
   quotient  = (long)*f_pos / elementsize;
   remainder = (long)*f_pos % elementsize;
