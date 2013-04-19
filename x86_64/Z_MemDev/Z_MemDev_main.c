@@ -2,7 +2,7 @@
  * Z_MemDev.c -- Memory Devices develpment module
                         with least functions
  *
- * version 1.0
+ * version 2.0
  * 
  * Copyright (C) 2013 Sizhou Wang
  * Copyright (C) 2010 IIT
@@ -24,6 +24,8 @@
 #include <linux/fs.h>
 #include <linux/cdev.h>
 
+#include <linux/seq_file.h>
+
 #include <asm-generic/errno.h>
 
 #include "Z_MemDev.h"
@@ -40,7 +42,7 @@ struct Z_MemDev_dev * MemDev_devices = NULL;
 MODULE_AUTHOR("Sizhou Wang");
 MODULE_LICENSE("Dual BSD/GPL");
 
-struct file_operations MemDev_fops = {
+static struct file_operations MemDev_fops = {
   .owner   = THIS_MODULE,
   //.llseek  = ,
   .read    = Z_MemDev_read,
@@ -49,7 +51,15 @@ struct file_operations MemDev_fops = {
   .release = Z_MemDev_release,
 };
 
-
+#ifdef MEMDEV_PROC
+struct file_operations MemDev_pfops = {
+  .owner   = THIS_MODULE,
+  .open    = Z_MemDev_proc_open,
+  .release = seq_release,
+  .read    = seq_read
+  //.llseek
+};
+#endif /* MEMDEV_PROC */
 
 /*****************************************************************************/
 /*   Function: Z_MemDev_trim                                                 */
@@ -106,6 +116,11 @@ static void __exit Z_MemDev_cleanup_module(void)
     }
     kfree(MemDev_devices);
   }
+#ifdef MEMDEV_PROC
+  Z_MemDev_proc_remove();
+#endif /* MEMDEV_PROC */
+
+  
   /* 2. Unregister Devices */
 	unregister_chrdev_region(devno, MemDev_num);
 	
@@ -171,7 +186,9 @@ static int __init Z_MemDev_init_module(void)
     Z_MemDev_setup_cdev(&MemDev_devices[i], i);
     
   }
-  
+#ifdef MEMDEV_PROC
+  Z_MemDev_proc_create();
+#endif /* MEMDEV_PROC */
   printk(KERN_INFO "Z_MemDev: init()  - End -\n");
   return 0; 
 }
@@ -185,4 +202,5 @@ module_exit(Z_MemDev_cleanup_module);
  *
  * 0.1: initialization version.
  * 1.0: file_operations version.
+ * 2.0: proc version with switch (MEMDEV_PROC).
  */

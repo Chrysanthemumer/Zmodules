@@ -1,7 +1,7 @@
 /*
  * Z_MemDev.h -- header for Memory Devices development modules
  *
- * version 1.0
+ * version 2.0
  * 
  * Copyright (C) 2013 Sizhou Wang
  * Copyright (C) 2010 IIT
@@ -66,10 +66,18 @@ ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, 
 //Helpers
 int Z_MemDev_trim(struct Z_MemDev_dev *dev);
 
-//proc
-void Z_MemDev_proc_create(void);
-void Z_MemDev_proc_remove(void)
 
+
+//proc
+#undef MEMDEV_PROC
+#define MEMDEV_PROC 1
+
+#ifdef MEMDEV_PROC
+void Z_MemDev_proc_create(void);
+void Z_MemDev_proc_remove(void);
+int Z_MemDev_proc_open(struct inode *inode, struct file *filp);
+extern struct file_operations MemDev_pfops;
+#endif /* MEMDEV_PROC */
 
 /****************/
 /* DEBUG REGION */
@@ -83,7 +91,7 @@ void Z_MemDev_proc_remove(void)
  *
  * 0.1: initialization version.
  * 1.0: file_operations version.
- * 2.0: proc version.
+ * 2.0: proc version with switch (MEMDEV_PROC).
  */
  
  #endif
