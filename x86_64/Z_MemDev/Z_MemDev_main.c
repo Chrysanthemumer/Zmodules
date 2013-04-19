@@ -48,6 +48,9 @@ struct file_operations MemDev_fops = {
   .open    = Z_MemDev_open,
   .release = Z_MemDev_release,
 };
+
+
+
 /*****************************************************************************/
 /*   Function: Z_MemDev_trim                                                 */
 /*Description: Empty out a MemDev device. (Destory and init Z_MemDev_list    */

@@ -53,6 +53,10 @@ typedef struct Z_MemDev_dev {
 
 extern int MemDev_list_size;
 extern int MemDev_list_length;
+extern int MemDev_num;
+
+extern struct Z_MemDev_dev * MemDev_devices;
+
 // File Operations
 int Z_MemDev_open(struct inode *inode, struct file *filp);
 int Z_MemDev_release(struct inode *inode, struct file *filp);
@@ -62,8 +66,9 @@ ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, 
 //Helpers
 int Z_MemDev_trim(struct Z_MemDev_dev *dev);
 
-
-
+//proc
+void Z_MemDev_proc_create(void);
+void Z_MemDev_proc_remove(void)
 
 
 /****************/
@@ -78,6 +83,7 @@ int Z_MemDev_trim(struct Z_MemDev_dev *dev);
  *
  * 0.1: initialization version.
  * 1.0: file_operations version.
+ * 2.0: proc version.
  */
  
  #endif

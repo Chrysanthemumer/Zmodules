@@ -1,7 +1,7 @@
 /*
  * Z_MemDev_fops.c -- File Operations for MemDev.
  *
- * version 1.0
+ * version 1.1
  * 
  * Copyright (C) 2013 Sizhou Wang
  * Copyright (C) 2010 IIT
@@ -48,7 +48,8 @@ int Z_MemDev_open(struct inode *inode, struct file *filp)
   
   printk(KERN_INFO "Z_MemDev: fops.open()  - End -\n");
   return 0;
-}
+}/* END */
+
 /*****************************************************************************/
 /*   Function: Z_MemDev_release                                              */
 /*Description: 'file_operations' release function for MemDev.                */
@@ -60,7 +61,7 @@ int Z_MemDev_release(struct inode *inode, struct file *filp)
   printk(KERN_INFO "Z_MemDev: fops.release() - Start -\n");
   printk(KERN_INFO "Z_MemDev: fops.release()  - End -\n");
   return 0;
-}
+}/* END */
 
 /*****************************************************************************/
 /*   Function: Z_MemDev_follow                                               */
@@ -88,7 +89,7 @@ struct Z_MemDev_list *Z_MemDev_followlist(struct Z_MemDev_dev *dev, int n)
   }
   
   return list;
-}
+}/* END */
 
 /*****************************************************************************/
 /*   Function: Z_MemDev_read                                                 */
@@ -140,7 +141,7 @@ ssize_t Z_MemDev_read(struct file *filp, char __user *buf, size_t count, loff_t 
   
   printk(KERN_INFO "Z_MemDev: fops.read()  - End -\n");
   return count;
-}
+}/* END */
 
 /*****************************************************************************/
 /*   Function: Z_MemDev_write                                                */
@@ -202,7 +203,7 @@ ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, 
   
   printk(KERN_INFO "Z_MemDev: fops.write()  - End -\n");
   return count;
-}
+}/* END */
  
  
  
@@ -211,4 +212,5 @@ ssize_t Z_MemDev_write(struct file *filp, const char __user *buf, size_t count, 
  *
  * 0.1: initialization version.
  * 1.0: file_operations version.
+ * 1.1: add 'END' after each function
  */
