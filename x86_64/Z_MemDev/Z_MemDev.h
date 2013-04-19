@@ -13,7 +13,7 @@
  * No warrenty is attached.
  */
  
- #include <linux/cdev.h>
+#include <linux/cdev.h>
  
 #ifndef _Z_MEMDEV_H_
 #define _Z_MEMDEV_H_
@@ -66,7 +66,9 @@ int Z_MemDev_trim(struct Z_MemDev_dev *dev);
 
 
 
-
+/****************/
+/* DEBUG REGION */
+/****************/
 
 
 
